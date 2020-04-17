@@ -1,0 +1,25 @@
+{
+  "name": "restgraph",
+  "version": "0.1.0",
+  "description": "used for limiting data set of rest json body",
+  "typings": "bin/index.d.ts",
+  "main": "bin/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dawnimpulse/restgraph.git"
+  },
+  "devDependencies": {
+    "typescript": "3.8.3"
+  },
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dawnimpulse/restgraph/issues"
+  },
+  "homepage": "https://github.com/dawnimpulse/restgraph#readme"
+}
