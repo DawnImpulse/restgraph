@@ -2,8 +2,8 @@
   "name": "restgraph",
   "version": "0.1.0",
   "description": "used for limiting data set of rest json body",
-  "typings": "bin/index.d.ts",
-  "main": "bin/index.js",
+  "typings": "lib/index.d.ts",
+  "main": "lib/index.js",
   "scripts": {
     "build": "tsc"
   },

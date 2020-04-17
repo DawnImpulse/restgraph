@@ -17,6 +17,8 @@ Written by Saksham <khrn.saksham002@gmail.com>, 17 April 2020
 
 */
 
+import restgraph from "./restgraph";
+
 /**
  * used to check if data type is json or not
  *
@@ -36,7 +38,7 @@ function typeOf(data) {
     } else {
         return "";
     }
-};
+}
 
 /**
  * converting the restgraph string to json mapper
@@ -44,8 +46,8 @@ function typeOf(data) {
  */
 function mapper(mapping) {
     let map = mapping.replace(/{/g, ":{");
+    if (map.charAt(0) == ":") map = map.slice(1);
     map = map.replace(/\[:{/, "[{");
-    map = map.slice(1);
     map = map.replace(/\[/g, ':[');
     map = map.replace(/,/g, ':true,');
     map = map.replace(/}/g, ':true}');
@@ -61,7 +63,9 @@ function mapper(mapping) {
     map = map.replace(/"}}/g, '}}');
     map = map.replace(/"}/g, '}');
     map = map.replace(/true"/g, 'true');
-
+    if (map.substring(0, 2) == '":')
+        map = map.slice(2);
+    console.log(map);
     return JSON.parse(map);
 }
 
@@ -122,7 +126,15 @@ function parse(map, data) {
  * @param data
  * @return object - mapped data
  */
-export default function (restGraph: string, data: object) : object{
+export function mapData(restGraph: string, data: object): object {
     const map = mapper(restGraph);
     return parse(map, data)
+}
+
+/**
+ * create restgraph map from a data
+ * @param data
+ */
+export function createMap(data: object): string {
+    return restgraph(data)
 }
