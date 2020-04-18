@@ -132,3 +132,16 @@ export function mapData(restGraph: string, data: object): object {
 export function createMap(data: object): string {
     return restgraph(data)
 }
+
+/**
+ * verify the restgraph
+ * @param map
+ */
+export function verifyMap(map: string): boolean {
+    try {
+        mapper(map);
+        return true
+    } catch (e) {
+        return false
+    }
+}
