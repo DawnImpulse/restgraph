@@ -36,42 +36,30 @@ const typeOf = function (data) {
     }
 };
 
-/**
- * convert data into semi-structured json object
- *
- * @param data - json to be mapped
- */
-function mapping(data): Object {
+function mapping(data): string {
 
     if (typeOf(data) == "OBJECT") {
         const keys = Object.keys(data);
-        const output = {};
+        let output = "{";
 
-        for (var i = 0; i < keys.length; i++) {
+        for (let i = 0; i < keys.length; i++) {
             const d = data[keys[i]];
-            if (typeOf(d) == "OBJECT") {
-                output[keys[i]] = mapping(d)
-            } else if (typeOf(d) == "ARRAY")
-                output[keys[i]] = array(d);
+            if (typeOf(d) == "OBJECT" || typeOf(d) == "ARRAY")
+                output += `${keys[i]}${mapping(d)}`;
             else
-                output[keys[i]] = true
+                output += `${keys[i]},`;
         }
-        return output;
-    } else if (typeOf(data) == "ARRAY") {
-        return array(data)
-    } else
-        return 0
-}
 
-/**
- * handling array for semi-structured json object
- * @param data
- */
-function array(data): object {
-    if (data.length > 0) {
-        return [mapping(data[0])]
+        return output + "},";
+
+    } else if (typeOf(data) == "ARRAY") {
+        let output = "{";
+        if (data.size > 0)
+            output += `${mapping(data[0])}`;
+        else
+            return output + "},";
     } else
-        return []
+        return "{},"
 }
 
 /**
@@ -81,10 +69,9 @@ function array(data): object {
  * @return string - restgraph string
  */
 export default function (data: object): string {
-    const mappings = mapping(data);
-    return JSON.stringify(mappings)
-        .replace(/"/g, '')
-        .replace(/:/g, '')
-        .replace(/true/g, '');
+    let mappings = mapping(data);
+    mappings = mappings
+        .replace(/,}/g,'}');
+    return mappings.substring(0,mappings.length-1);
 }
 

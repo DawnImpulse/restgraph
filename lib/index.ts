@@ -63,6 +63,7 @@ function mapper(mapping) {
     map = map.replace(/"}}/g, '}}');
     map = map.replace(/"}/g, '}');
     map = map.replace(/true"/g, 'true');
+    map = map.replace(/"":true/, '');
     if (map.substring(0, 2) == '":')
         map = map.slice(2);
     console.log(map);
@@ -80,6 +81,8 @@ function parse(map, data) {
     if (typeOf(map) == "ARRAY") {
 
         const newData = [];
+        if (map.length == 0)
+            return data;
         for (let i = 0; i < data.length; i++) {
             if (map.length == 0) {
                 newData.push(data[i])
@@ -92,28 +95,32 @@ function parse(map, data) {
     } else {
         const newData = {};
         const keys = Object.keys(map);
-        const dKeys = Object.keys(data);
 
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            const value = map[key];
+        if (Object.keys(map).length == 0)
+            return data;
+        else
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const value = map[key];
 
-            if (data[key] != undefined) {
-                if (typeOf(value) == "OBJECT") {
-                    if (typeOf(data[key]) == "OBJECT")
-                        newData[key] = parse(value, data[key]);
-                    else
-                        newData[key] = null
-                } else if (typeOf(value) == "ARRAY") {
-                    if (typeOf(data[key]) == "ARRAY")
-                        newData[key] = parse(value, data[key]);
-                    else
-                        newData[key] = null
-                } else
+                if (value == {}) {
                     newData[key] = data[key]
-            } else
-                newData[key] = null
-        }
+                } else if (data[key] != undefined) {
+                    if (typeOf(value) == "OBJECT") {
+                        if (typeOf(data[key]) == "OBJECT")
+                            newData[key] = parse(value, data[key]);
+                        else
+                            newData[key] = null
+                    } else if (typeOf(value) == "ARRAY") {
+                        if (typeOf(data[key]) == "ARRAY")
+                            newData[key] = parse(value, data[key]);
+                        else
+                            newData[key] = null
+                    } else
+                        newData[key] = data[key]
+                } else
+                    newData[key] = null
+            }
 
         return newData;
     }
