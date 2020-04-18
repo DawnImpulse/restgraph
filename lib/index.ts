@@ -42,31 +42,18 @@ function typeOf(data) {
 
 /**
  * converting the restgraph string to json mapper
- * @param mapping
+ * @param map
  */
-function mapper(mapping) {
-    let map = mapping.replace(/{/g, ":{");
-    if (map.charAt(0) == ":") map = map.slice(1);
-    map = map.replace(/\[:{/, "[{");
-    map = map.replace(/\[/g, ':[');
-    map = map.replace(/,/g, ':true,');
-    map = map.replace(/}/g, ':true}');
-    map = map.replace(/}:true,/g, '},');
-    map = map.replace(/]:true,/g, '],');
-    map = map.replace(/]:true/g, ']');
-    map = map.replace(/}:true/g, '}');
-    map = map.replace(/{/g, '{"');
-    map = map.replace(/,/g, ',"');
-    map = map.replace(/:/g, '":');
-    map = map.replace(/}/g, '"}');
-    map = map.replace(/"}]/g, '}]');
-    map = map.replace(/"}}/g, '}}');
-    map = map.replace(/"}/g, '}');
-    map = map.replace(/true"/g, 'true');
-    map = map.replace(/"":true/, '');
-    if (map.substring(0, 2) == '":')
-        map = map.slice(2);
-    console.log(map);
+function mapper(map) {
+    map = map.replace(/{/g, '{"')
+    map = map.replace(/}/g, '":true}')
+    map = map.replace(/{"/g, '":{"')
+    map = map.slice(2);
+    map = map.replace(/,/g, '","')
+    map = map.replace(/,/g, ':true,')
+    map = map.replace(/}":true/g, '}')
+    map = map.replace(/{"":true}/g, '{}')
+
     return JSON.parse(map);
 }
 
@@ -76,54 +63,54 @@ function mapper(mapping) {
  * @param map
  * @param data
  */
-function parse(map, data) {
-
-    if (typeOf(map) == "ARRAY") {
-
-        const newData = [];
-        if (map.length == 0)
-            return data;
-        for (let i = 0; i < data.length; i++) {
-            if (map.length == 0) {
-                newData.push(data[i])
-            } else {
-                newData.push(parse(map[0], data[i]))
+function parser(map, data) {
+    if (Object.keys(map).length > 0) {
+        // it is an array
+        if (typeOf(data) == "ARRAY") {
+            const newData = [];
+            // work on individual elements
+            for (var i = 0; i < data.length; i++) {
+                const el = data[i];
+                newData.push(parser(map, data[i]))
             }
-        }
-        return newData;
+            return newData;
+            // it is an object
+        } else if (typeOf(data) == "OBJECT") {
+            const newData = {};
+            const keys = Object.keys(map);
+            const dKeys = Object.keys(data);
 
-    } else {
-        const newData = {};
-        const keys = Object.keys(map);
-
-        if (Object.keys(map).length == 0)
-            return data;
-        else
-            for (let i = 0; i < keys.length; i++) {
+            // for every key in map
+            for (var i = 0; i < keys.length; i++) {
                 const key = keys[i];
                 const value = map[key];
 
-                if (value == {}) {
-                    newData[key] = data[key]
-                } else if (data[key] != undefined) {
+                // if key does exist in data
+                if (data[key] != undefined) {
+                    // if map value is object
                     if (typeOf(value) == "OBJECT") {
+                        // if data value is object
                         if (typeOf(data[key]) == "OBJECT")
-                            newData[key] = parse(value, data[key]);
+                            newData[key] = parser(value, data[key])
+                        // else if data value is an array
+                        else if (typeOf(data[key]) == "ARRAY")
+                            newData[key] = parser(value, data[key])
+                        // else data value is of other type than expected
                         else
                             newData[key] = null
-                    } else if (typeOf(value) == "ARRAY") {
-                        if (typeOf(data[key]) == "ARRAY")
-                            newData[key] = parse(value, data[key]);
-                        else
-                            newData[key] = null
+                        // if map value not object then copy the whole obj
                     } else
                         newData[key] = data[key]
+                    // else key does exist in data
                 } else
-                    newData[key] = null
+                    newData[key] = {}
             }
 
-        return newData;
-    }
+            return newData;
+        }
+        // return whole data
+    } else
+        return data
 }
 
 /**
@@ -135,7 +122,7 @@ function parse(map, data) {
  */
 export function mapData(restGraph: string, data: object): object {
     const map = mapper(restGraph);
-    return parse(map, data)
+    return parser(map, data)
 }
 
 /**
