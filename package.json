@@ -1,6 +1,6 @@
 {
-  "name": "restgraph",
-  "version": "0.1.0",
+  "name": "restmap",
+  "version": "0.1.1",
   "description": "used for limiting data set of rest json body",
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",

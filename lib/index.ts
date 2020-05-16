@@ -86,7 +86,7 @@ function parser(map, data) {
                 const value = map[key];
 
                 // if key does exist in data
-                if (data[key] != undefined) {
+                if (data[key]) {
                     // if map value is object
                     if (typeOf(value) == "OBJECT") {
                         // if data value is object
@@ -102,8 +102,12 @@ function parser(map, data) {
                     } else
                         newData[key] = data[key]
                     // else key does exist in data
-                } else
-                    newData[key] = {}
+                } else {
+                    if (data[key] === null)
+                        newData[key] = null;
+                    else
+                        newData[key] = {}
+                }
             }
 
             return newData;
